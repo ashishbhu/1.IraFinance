@@ -414,8 +414,108 @@ public class FinanceDatabase
 	 
 			}
  
+ /*5.-------------------------------TEMP PASSWORD-------------------------------*/
+		
+		
+		public String tempPass(String  username,String password)
+			{
+				int flag=0;
+				String rg="update registration set pswd=? where username=?";
+				String lc="update logincontrol set pswd=? ,forcechgpwd=? where username=?";
+			
+					try
+						{
+				
+				
+							//Statement st3=con.createStatement();
+							PreparedStatement ps = con.prepareStatement(rg);
+							PreparedStatement fcp = con.prepareStatement(lc);
+			
+							ps.setString(1, password);
+							ps.setString(2, username);
+			
+							fcp.setString(1, password);
+							fcp.setString(2, "YES");
+							fcp.setString(3, username);
+			
+							ps.executeUpdate();
+							fcp.executeUpdate();
+		      
+						}
+					catch(Exception e)
+						{
+							flag=1;
+							System.out.println(e);
+						}
+					if(flag==1)
+						return "no";
+					
+						return "yes";
+		}	
+		
+		
+/*6.---------------------------------RESET PASSWORD---------------------------------*/		
+		
  
- 
+		public String resetPass(String username,String password)
+		{
+			//int flag=0;
+				String rege="select userName from registration";
+			
+					try
+						{
+							Statement st=con.createStatement();
+							ResultSet rs=st.executeQuery(rege);
+							
+							/*-------CHECKING FOR MSIN USER-----*/ 
+								while(rs.next())
+									if(rs.getString(1).equals(username))
+										{
+											int flag1=0;
+											String rg="update registration set pswd=? where username=?";
+											String lc="update logincontrol set pswd=? ,forcechgpwd=? where username=?";
+		    		
+		    		
+											try
+												{
+		    			
+		    			
+												//Statement st3=con.createStatement();
+												PreparedStatement ps = con.prepareStatement(rg);
+												PreparedStatement fcp = con.prepareStatement(lc);
+		    		
+												ps.setString(1, password);
+												ps.setString(2, username);
+		    		
+												fcp.setString(1, password);
+												fcp.setString(2, "NO");
+												fcp.setString(3, username);
+		    		
+												ps.executeUpdate();
+												fcp.executeUpdate();
+		    	      
+												}
+											catch(Exception e)
+												{
+													//System.out.println("AKJ");
+													flag1=1;
+													System.out.println(e);
+												}
+											if(flag1==1)
+												return "nreset";   /*--not reset---*/
+												return "reset";
+		    		
+										}
+						}
+
+				    	/*--------Main Exception-------*/
+							catch(Exception e)
+							{  // flag=1;
+								System.out.println(e);
+							}
+							return "error";
+					
+		  }
 
 }
 

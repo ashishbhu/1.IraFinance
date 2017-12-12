@@ -80,5 +80,29 @@ public class ResourceServices {
 		   return db.forgetPd(username);
 	
 	   }
+	   
+	   
+/*5.-------------------------------TEMP PASSWORD--------------------------------------*/
+	   
+	   @GET
+	   @Path("temppass")
+	   //@Consumes(MediaType.APPLICATION_XML)
+	   public String tempPassword(@QueryParam("user") String username,@QueryParam("pass") String password )
+	   {
+		   return db.tempPass(username,password);
+	   }  
+	   
+	   
+/*6.---------------------------------RESET PASSWORD---------------------------------*/
+	   
+	   @GET
+	   @Path("resetpass")
+	   @Consumes(MediaType.APPLICATION_XML)
+	   public String resetPassword(@QueryParam("user") String username,@QueryParam("pass") String password)
+	   {
+		   return db.resetPass(username,password);
+	   }
+	   
+	   
 
 }

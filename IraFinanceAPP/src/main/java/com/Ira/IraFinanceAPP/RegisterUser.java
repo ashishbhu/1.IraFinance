@@ -16,7 +16,14 @@ public class RegisterUser {
 	private String substartdate;
 	private String subenddate;
 	
+	private String username;
 	
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
 	public int getSubid() {
 		return subid;
 	}

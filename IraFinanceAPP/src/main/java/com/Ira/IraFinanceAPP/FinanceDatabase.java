@@ -2,6 +2,8 @@ package com.Ira.IraFinanceAPP;
 
 import java.sql.*;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -161,7 +163,7 @@ public class FinanceDatabase
 		    				st1.setInt(1, id);
 		    				st1.setString(2, r2.getPassword());
 		    				st1.setString(3, r2.getAcctlocked());
-		    				st1.setString(4, "NO");
+		    				st1.setString(4, "false");
 		    				st1.setInt(5, 15);
 		    				st1.setString(6, "true");
 		    				
@@ -234,7 +236,7 @@ public class FinanceDatabase
 
 													jo.put("check","success" );
 													jo.put("accl",rs.getString(3));
-													jo.put("fchg",rs.getString(4));
+													jo.put("forcep",rs.getString(4));
 													jo.put("access", rs.getInt(5));
 			 		  
 													return jo.toString();
@@ -248,7 +250,7 @@ public class FinanceDatabase
 									{
 										jo.put("check", "unotexit" );
 										jo.put("accl",  "null");
-										jo.put("fchg",  "null");
+										jo.put("forcep",  "null");
 										jo.put("access","null");
 			  
 										return jo.toString();
@@ -258,7 +260,7 @@ public class FinanceDatabase
 									{
 										jo.put("check", "pnotexit" );
 										jo.put("accl",  "null");
-										jo.put("fchg",  "null");
+										jo.put("forcep",  "null");
 										jo.put("access","null");
 			  
 										return jo.toString();
@@ -435,7 +437,7 @@ public class FinanceDatabase
 							ps.setString(2, username);
 			
 							fcp.setString(1, password);
-							fcp.setString(2, "YES");
+							fcp.setString(2, "true");
 							fcp.setString(3, username);
 			
 							ps.executeUpdate();
@@ -488,7 +490,7 @@ public class FinanceDatabase
 												ps.setString(2, username);
 		    		
 												fcp.setString(1, password);
-												fcp.setString(2, "NO");
+												fcp.setString(2, "false");
 												fcp.setString(3, username);
 		    		
 												ps.executeUpdate();
@@ -516,6 +518,179 @@ public class FinanceDatabase
 							return "error";
 					
 		  }
+		
+		
+		
+/*7.-----------------------SUB USER REEGISTRATION--------------------*/
+		
+		public String createSuser(String user,String username,String pswd,String access,
+				                   String substartdate,String subenddate)
+			{  
+				int subid=0 ,flag=0;
+				String mu="select  *from registration where userName="+user;
+				String su="insert into subuser values(?,?,?,?,?,?,?)";
+				String control="select childUserName from subuser";
+				String log="insert into logincontrol(userName,password,acctLocked,forceChgPwd,access)"
+					+ "values(?,?,?,?,?)";
+			
+				RegisterUser r=new RegisterUser();
+			
+				r.setUsername(username);
+				r.setPassword(pswd);
+			
+				r.setSubstartdate(substartdate);
+				r.setSubenddate(subenddate);
+			
+					try
+						{
+							Statement st3=con.createStatement();
+							ResultSet rs1=st3.executeQuery(control);
+		    
+								while(rs1.next())
+									if(rs1.getString(1).equals(r.getUsername()))
+										return "subexist";
+						}
+					catch(Exception e)
+						{   flag=1;
+							System.out.println(e);
+						}
+			
+					try {
+							Statement st=con.createStatement();
+							ResultSet rs=st.executeQuery(mu);
+							rs.next();
+							subid=rs.getInt(1);
+							System.out.println(subid);
+		     
+						}
+					catch(Exception e)
+					{
+						flag=1;
+						System.out.println(e);
+					}
+			
+			
+					try {
+							PreparedStatement st1=con.prepareStatement(su);
+							PreparedStatement st2=con.prepareStatement(log);
+				
+							st1.setInt(1, subid);
+							st1.setString(2, r.getUsername());
+							st1.setString(3, r.getPassword());
+							st1.setString(4, "false");
+							st1.setString(5, r.getSubstartdate());
+							st1.setString(6, r.getSubenddate());
+							st1.setString(7, "true");
+							st1.setString(8, access);
+		        
+							st2.setString(1, r.getUsername());
+							st2.setString(2, r.getPassword());
+							st2.setString(3, "false");
+							st2.setString(4, "false");
+							st2.setString(5, access);
+							st2.setString(6, "true");
+		        
+							st1.executeUpdate(); 
+							st2.executeUpdate();
+						}
+					catch(Exception e)
+						{   flag=1;
+							System.out.println(e);
+						}
+					if(flag==1)
+						return "error";
+							return "success";
+			}		
+		
+		
+		
+/*8.------------------------------------------GET ALL SUB USER NAME BY MAIN USER NAME-------------*/
+			
+		public String allSubUser(String username)
+			{
+				int id=0, flag=0;
+				
+				JSONObject jo = new JSONObject();
+				JSONArray ja = new JSONArray();
+				
+					try {
+							jo.put("subusername", ja);
+						}
+					catch (JSONException e1) 
+						{
+					// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+				
+				
+				/*-------Geting subid of Main User from Registration--*/
+				
+						String main="select subId from registration where userName="+username;
+				
+						try
+							{
+					
+								Statement st=con.createStatement();
+								ResultSet rs=st.executeQuery(main);
+			     
+								rs.next();
+								id=rs.getInt(1);
+								//System.out.println("ASSS");
+								//System.out.println(id);
+			     
+							}
+						catch(Exception e)
+							{
+								flag=1;
+								//System.out.println("mainusernotexist");
+					
+								System.out.println(e);
+							}
+						if(flag==1)
+							return jo.toString();
+				
+				
+				
+				
+				      /*----Fetching all user name from subuser table using main user subid--*/
+				
+						String sub = "select subId,childUserName from subuser where subId="+id;
+							
+						try
+							{
+					
+								Statement st1=con.createStatement();
+								ResultSet rs1=st1.executeQuery(sub);
+			     	
+								while(rs1.next())
+									{
+										int s=rs1.getInt(1);
+											if(s==id) 
+												{
+			    		
+			    		
+													ja.put(rs1.getString(2));
+			        
+			            
+													//System.out.println(ja);
+												}
+			    	
+									}
+			    	
+
+							}
+						catch(Exception e)
+							{
+								flag=2;
+					
+								System.out.println(e);
+							}
+						if(flag==2)
+							return jo.toString();
+							//System.out.println(jo);
+
+							return jo.toString();
+			}
 
 }
 

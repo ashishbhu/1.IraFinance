@@ -104,5 +104,26 @@ public class ResourceServices {
 	   }
 	   
 	   
-
+	   
+/*7.-------------------------------SUB USER REGISTRATION-----------------------------------*/
+	   
+	   @GET
+	   @Path("csuser")
+	   @Consumes(MediaType.APPLICATION_XML)
+	   public String createSubUser(@QueryParam("user") String user, @QueryParam("cuname") String username,
+			   @QueryParam("cpass") String paswd,@QueryParam("access") String  access,
+			   @QueryParam("sdate") String substartdate,@QueryParam("edate") String subenddate)
+	   {
+		   return db.createSuser(user,username,paswd,access,substartdate,subenddate);
+	   }
+    	   
+	   
+/*9.-------------------------OK----------GET ALL SUB USER NAME BY MAIN USER NAME-----------------*/
+	   @GET
+	   @Path("allsubuser")
+	   @Produces(MediaType.APPLICATION_JSON)
+	   public String getAllSubUser(@QueryParam("user") String username)
+	   {
+		   return db.allSubUser(username);
+	   }
 }

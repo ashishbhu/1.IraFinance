@@ -604,7 +604,7 @@ public class FinanceDatabase
 		
 		
 		
-/*8.------------------------------------------GET ALL SUB USER NAME BY MAIN USER NAME-------------*/
+/*8.-------------------------------GET ALL SUB USER NAME BY MAIN USER NAME-----------------------*/
 			
 		public String allSubUser(String username)
 			{
@@ -691,6 +691,47 @@ public class FinanceDatabase
 
 							return jo.toString();
 			}
+		
+		
+		
+
+/*10---------------------------------FOR EDIT USER ACCESS-----------------------------------------*/
+		
+		public String editSuser(String username,String paswd,String access)
+		{
+			int flag=0;
+			
+			String sub="update subuser set childPassword=?, access=? where childUserName=?";
+			String login="update logincontrol set password=?,access=? where userName=?";
+			
+			try
+				{
+					PreparedStatement ps = con.prepareStatement(sub);
+					PreparedStatement ps1 = con.prepareStatement(login);
+			
+					ps.setString(1, paswd);
+					ps.setString(2, access);
+					ps.setString(3, username);
+			
+					ps1.setString(1, paswd);
+					ps1.setString(2, access);
+					ps1.setString(3, username);
+			
+					ps.executeUpdate();
+					ps1.executeUpdate();
+				}
+				catch(Exception e)
+					{
+						flag=1;
+						System.out.println(e);
+					}
+				if(flag==1)
+					return "error";
+			
+				return "success";
+		}		
+		
+		
 
 }
 

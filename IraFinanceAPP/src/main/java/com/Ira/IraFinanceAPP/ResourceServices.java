@@ -118,7 +118,7 @@ public class ResourceServices {
 	   }
     	   
 	   
-/*9.-------------------------OK----------GET ALL SUB USER NAME BY MAIN USER NAME-----------------*/
+/*8.-------------------------OK----------GET ALL SUB USER NAME BY MAIN USER NAME-----------------*/
 	   @GET
 	   @Path("allsubuser")
 	   @Produces(MediaType.APPLICATION_JSON)
@@ -126,4 +126,17 @@ public class ResourceServices {
 	   {
 		   return db.allSubUser(username);
 	   }
+	   
+	   
+/*9------------------OK---------FOR EDIT USER ACCESS----------------------------------------------*/
+	   
+	   @GET
+	   @Path("editsubuser")
+	   public String editSubUser(@QueryParam("user") String username,@QueryParam("pass") String paswd,
+			   					 @QueryParam("access") String access)
+	   {
+		  return db.editSuser(username,paswd,access);
+	   }
+	   	   
+	   
 }

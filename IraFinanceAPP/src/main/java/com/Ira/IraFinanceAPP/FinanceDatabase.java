@@ -16,7 +16,7 @@ public class FinanceDatabase
 		public FinanceDatabase() 
 		{
 		
-			String url="jdbc:mysql://localhost:3306/irafinance";
+			String url="jdbc:mysql://localhost:3306/irafinance?useUnicode=true&characterEncoding=UTF-8";
 			String username="root";
 			String password="ashish";
 		
@@ -198,83 +198,188 @@ public class FinanceDatabase
  
 		public String loginUser(String username,String password)
 		{
+			
+			int flag=0,temp=0;
 			System.out.println("2.Login");
 	 
 			JSONObject jo=new JSONObject();
 	 
 			String log="select *from logincontrol";
 	 
-				String log1="update logincontrol set forcelogin=? where username=?";
-				int flag=0;
 				
+			String reg="select subid from registration";
+			
 				try
+				{
+				Statement st1=con.createStatement();
+				ResultSet rs1=st1.executeQuery(reg);
+				
+					while(rs1.next())
 					{
-						Statement st=con.createStatement();
-						ResultSet rs=st.executeQuery(log);
+						if(username.equals(rs1.getString(1)))
+						{
+							temp=1;
+						
+						}
+					}
+				
+				}
+				catch(Exception e)
+				{
+					System.out.println(e);
+				}
+				
+				
+				if(temp==1)
+				{
+				
+					try
+						{
+							Statement st=con.createStatement();
+							ResultSet rs=st.executeQuery(log);
 	 	
-							while(rs.next())
-								{   //flag=1;
+								while(rs.next())
+									{   //flag=1;
 	 		
-									if(username.equals(rs.getString(1)))
-										{     
-											flag=2;
+										if(username.equals(rs.getString(1)))
+											{     
+												flag=2;
 											//System.out.println("h"); 
 	 		
-											if(password.equals(rs.getString(2)))
-	 				
-												{
-													flag=4;
+												if(password.equals(rs.getString(2)))
+												
+													{
+														flag=4;
 					
-													PreparedStatement ps = con.prepareStatement(log1);
-					
-													ps.setString(1, "false");
-													ps.setString(2, username);
-					
-													ps.executeUpdate();
-					
-					
-
-													jo.put("check","success" );
-													jo.put("accl",rs.getString(3));
-													jo.put("forcep",rs.getString(4));
-													jo.put("access", rs.getInt(5));
+														jo.put("parentuser", rs.getInt(1));
+														jo.put("check","success" );
+														jo.put("accl",rs.getString(3));
+														jo.put("forcep",rs.getString(4));
+														jo.put("access", rs.getInt(5));
 			 		  
-													return jo.toString();
+														return jo.toString();
 					
-												}
+													}
 	 				
+											}
+									}
+	 	
+									if(flag==0)
+										{
+											jo.put("parentuser", "null");
+											jo.put("check", "uincorrect" );
+											jo.put("accl",  "null");
+											jo.put("forcep",  "null");
+											jo.put("access","null");
+			  
+											return jo.toString();
 										}
-								}
-	 	
-								if(flag==0)
-									{
-										jo.put("check", "unotexit" );
-										jo.put("accl",  "null");
-										jo.put("forcep",  "null");
-										jo.put("access","null");
-			  
-										return jo.toString();
-									}
 			 
-								if(flag==2)
-									{
-										jo.put("check", "pnotexit" );
-										jo.put("accl",  "null");
-										jo.put("forcep",  "null");
-										jo.put("access","null");
+									if(flag==2)
+										{
+											jo.put("parentuser", "null");
+											jo.put("check", "pincorrect" );
+											jo.put("accl",  "null");
+											jo.put("forcep",  "null");
+											jo.put("access","null");
 			  
-										return jo.toString();
-									}
+											return jo.toString();
+										}
 	 	
+						}
+						catch(Exception e)
+							{
+								flag=3;
+								System.out.println(e);
+							}
+	 
+							if(flag==3)
+								return "error1";
+					}
+				
+				
+				else
+				{
+					System.out.println("else");
+					String login="select *from logincontrol";
+					
+					String s1="'"+username+"'";
+					String subu="select subid from subuser where childUserName="+s1;
+					
+					int id=0;
+					try
+					{
+					Statement st3=con.createStatement();
+					ResultSet rs3=st3.executeQuery(subu);
+						rs3.next();
+						id=rs3.getInt(1);
+					
 					}
 					catch(Exception e)
+					{
+						System.out.println(e);
+					}
+					
+					int flag1=0;
+					
+					try
+					{
+						Statement st2=con.createStatement();
+						ResultSet rs2=st2.executeQuery(login);
+						
+						while(rs2.next())
 						{
-							flag=3;
-							System.out.println(e);
+							if(username.equals(rs2.getString(1)))
+							{
+										flag1=1;
+									if(password.equals(rs2.getString(2)))
+										{
+											flag1=2;
+										
+											jo.put("parentuser", id);
+											jo.put("check","success" );
+											jo.put("accl",rs2.getString(3));
+											jo.put("forcep",rs2.getString(4));
+											jo.put("access", rs2.getInt(5));
+										
+											return jo.toString();
+											
+	
+										}
+
+							}
+								
 						}
-	 
-					if(flag==3)
-						return "error1";
+						
+						if(flag1==0)
+						{
+							jo.put("parentuser", "null");
+							jo.put("check", "uincorrect" );
+							jo.put("accl",  "null");
+							jo.put("forcep",  "null");
+							jo.put("access","null");
+  
+							return jo.toString();
+						}
+						
+						if(flag1==2)
+						{
+							jo.put("parentuser", "null");
+							jo.put("check", "pincorrect" );
+							jo.put("accl",  "null");
+							jo.put("forcep",  "null");
+							jo.put("access","null");
+  
+							return jo.toString();
+						}
+						
+						
+					}
+					catch(Exception e)
+					{
+						System.out.println(e);
+					}
+				}
 	  
 						return "error2";
 	 
@@ -282,10 +387,12 @@ public class FinanceDatabase
  
  
  
- /*2.-------------------FORGET USER NAME--------------------------------------------*/
+ /*3.-------------------FORGET USER NAME--------------------------------------------*/
  
 		public String forgetUs(String mobilenumber)
 			{
+			System.out.println("3.Foreget User Name");
+				
 				int flag=0;
 				String mo="select subid,mobilenumber,emailid,acctlocked from registration";
 		
@@ -353,14 +460,15 @@ public class FinanceDatabase
 						
 			}
 	
- /*3.-----------------------------FORGET PASSWORD-------------------------------------------*/
+ /*4.-----------------------------FORGET PASSWORD-------------------------------------------*/
  
  
  
 		public String forgetPd(String username)
 			{
+				System.out.println("4.Forget Password");
 	 
-				String un="select subid,mobilenumber,emailid,acctlocked, from registration";
+				String un="select subid,mobilenumber,emailid,acctlocked from registration";
 		
 				JSONObject jo=new JSONObject();
 		
@@ -421,10 +529,41 @@ public class FinanceDatabase
 		
 		public String tempPass(String  username,String password)
 			{
-				int flag=0;
-				String rg="update registration set pswd=? where username=?";
-				String lc="update logincontrol set pswd=? ,forcechgpwd=? where username=?";
+				System.out.println("5.Temp Password");
 			
+				int flag=0,temp=0;
+				String s="'"+username+"'";
+				String rg="update registration set pswd=? where subid=?";
+				
+				String lc="update logincontrol set pswd=? ,forcechgpwd=? where username="+s;
+				
+				
+				/*-------------------CHECKING USER EXIST OR NOT---------------------------*/
+				String main="select subid from registration";
+					
+					try
+					{
+					Statement st=con.createStatement();
+					ResultSet rs=st.executeQuery(main);
+					
+						while(rs.next())
+						{
+							if(username==rs.getString(1))
+							{
+								temp=1;
+							}
+						}
+						if(temp==0)
+							return "unotexist";
+					
+					}
+					catch(Exception e)
+					{
+						System.out.println(e);
+					}
+					
+					
+					
 					try
 						{
 				
@@ -438,7 +577,7 @@ public class FinanceDatabase
 			
 							fcp.setString(1, password);
 							fcp.setString(2, "true");
-							fcp.setString(3, username);
+							//fcp.setString(3, username);
 			
 							ps.executeUpdate();
 							fcp.executeUpdate();
@@ -450,9 +589,9 @@ public class FinanceDatabase
 							System.out.println(e);
 						}
 					if(flag==1)
-						return "no";
+						return "error";
 					
-						return "yes";
+						return "success";
 		}	
 		
 		
@@ -461,20 +600,21 @@ public class FinanceDatabase
  
 		public String resetPass(String username,String password)
 		{
+			System.out.println("6.Reset Password");
 			//int flag=0;
-				String rege="select userName from registration";
+				String rege="select subid from registration";
 			
 					try
 						{
 							Statement st=con.createStatement();
 							ResultSet rs=st.executeQuery(rege);
 							
-							/*-------CHECKING FOR MSIN USER-----*/ 
+							/*-------CHECKING FOR MAIN USER-----*/ 
 								while(rs.next())
 									if(rs.getString(1).equals(username))
 										{
 											int flag1=0;
-											String rg="update registration set pswd=? where username=?";
+											String rg="update registration set pswd=? where subid=?";
 											String lc="update logincontrol set pswd=? ,forcechgpwd=? where username=?";
 		    		
 		    		
@@ -521,17 +661,19 @@ public class FinanceDatabase
 		
 		
 		
-/*7.-----------------------SUB USER REEGISTRATION--------------------*/
+/*7.-----------------------SUB USER REGISTRATION--------------------*/
 		
 		public String createSuser(String user,String username,String pswd,String access,
 				                   String substartdate,String subenddate)
-			{  
+			{ 
+				System.out.println("7.User Registration");
 				int subid=0 ,flag=0;
-				String mu="select  *from registration where userName="+user;
-				String su="insert into subuser values(?,?,?,?,?,?,?)";
-				String control="select childUserName from subuser";
-				String log="insert into logincontrol(userName,password,acctLocked,forceChgPwd,access)"
-					+ "values(?,?,?,?,?)";
+				
+				String control="select  childUserName from subuser";
+				String mu="select  *from registration where subid="+user;
+				String su="insert into subuser values(?,?,?,?,?,?,?,?)";
+				
+				String log="insert into logincontrol values(?,?,?,?,?,?,?)";
 			
 				RegisterUser r=new RegisterUser();
 			
@@ -586,10 +728,11 @@ public class FinanceDatabase
 							st2.setString(1, r.getUsername());
 							st2.setString(2, r.getPassword());
 							st2.setString(3, "false");
-							st2.setString(4, "false");
+							st2.setString(4, "true");
 							st2.setString(5, access);
 							st2.setString(6, "true");
-		        
+							st2.setInt(7, subid );
+							
 							st1.executeUpdate(); 
 							st2.executeUpdate();
 						}
@@ -608,6 +751,8 @@ public class FinanceDatabase
 			
 		public String allSubUser(String username)
 			{
+			
+			System.out.println("8.All Sub User Name");
 				int id=0, flag=0;
 				
 				JSONObject jo = new JSONObject();
@@ -625,7 +770,7 @@ public class FinanceDatabase
 				
 				/*-------Geting subid of Main User from Registration--*/
 				
-						String main="select subId from registration where userName="+username;
+						String main="select subId from registration";
 				
 						try
 							{
@@ -654,7 +799,7 @@ public class FinanceDatabase
 				
 				      /*----Fetching all user name from subuser table using main user subid--*/
 				
-						String sub = "select subId,childUserName from subuser where subId="+id;
+						String sub = "select subId,childUserName from subuser where subId="+username;
 							
 						try
 							{
@@ -664,8 +809,8 @@ public class FinanceDatabase
 			     	
 								while(rs1.next())
 									{
-										int s=rs1.getInt(1);
-											if(s==id) 
+										//int s=rs1.getInt(1);
+											if(username.equals(rs1.getString(1))) 
 												{
 			    		
 			    		
@@ -695,14 +840,41 @@ public class FinanceDatabase
 		
 		
 
-/*10---------------------------------FOR EDIT USER ACCESS-----------------------------------------*/
+/*9.---------------------------------FOR EDIT USER ACCESS-----------------------------------------*/
 		
 		public String editSuser(String username,String paswd,String access)
 		{
-			int flag=0;
+			System.out.println("9.Edit User Access");
+			int flag=0,temp=0;
 			
 			String sub="update subuser set childPassword=?, access=? where childUserName=?";
-			String login="update logincontrol set password=?,access=? where userName=?";
+			String login="update logincontrol set pswd=?,access=? where userName=?";
+			
+				String subuser="select childUserName from subuser ";
+			
+			
+				try
+				{
+					Statement st=con.createStatement();
+					ResultSet rs=st.executeQuery(subuser);
+					
+					while(rs.next())
+					{
+						if(rs.getString(1).equals(username))
+						{
+							temp=1;
+							break;
+						}
+					}
+					
+					if(temp==0)
+						return "uincorrect";
+				}
+				catch(Exception e)
+				{
+					System.out.println(e);
+					
+				}
 			
 			try
 				{
@@ -731,7 +903,144 @@ public class FinanceDatabase
 				return "success";
 		}		
 		
+
+		
+		
+/*10.--------------------------------GET SUB USER ACCESS  FROM MAIN USER-----------------------------------*/
+		public String getSubAccess(String username)
+		{
+			System.out.println("10.Get Sub User Access");
+				int flag=0;
+				String suser="select childUserName from subuser";
+				String slogin="select *from logincontrol";
+			 
+			 
+				JSONObject jo=new JSONObject();
+			 
+					try
+						{
+							Statement st=con.createStatement();
+							ResultSet rs=st.executeQuery(suser);
+		     
+							Statement st1=con.createStatement();
+							ResultSet rs1=st1.executeQuery(slogin);
+							
+							while(rs.next())
+								if(rs.getString(1).equals(username))
+									{    
+										flag=1;
+										break;
+									}
+							
+							if(flag==1)
+								{
+									while(rs1.next())
+										if(rs1.getString(1).equals(username))
+											if(rs1.getString(3).equals("false"))
+												{   flag=2;
+		    		
+													jo.put("check","suexist");
+													jo.put("accl", "false");
+													jo.put("access", rs1.getString(5));
+		    			 
+													return jo.toString();
+												}
+								}
+		     	
+		     	
+						}
+					catch(Exception e)
+						{   
+							System.out.println(e);
+						}
+			 
+			 
+					if(flag==0)
+						{
+							try
+							{
+							jo.put("check","udoesnotexist");
+							jo.put("accl", "null");
+							jo.put("access","null");
+				 
+				
+							return jo.toString();
+							}
+							catch(Exception e)
+							{
+								System.out.println(e);
+							}
+						}
+					if(flag==1)
+						{
+							try
+							{
+							jo.put("check","uexist");
+							jo.put("accl", "true");
+							jo.put("access","null"); 
+				 
+			 
+							return jo.toString();
+							}
+							catch(Exception e)
+							{
+								System.out.println(e);
+							}
+						}	
+					
+					return "error";
+		
+		}	
+		
+		
+		
+	/*----------------------------------------HINDI-------------------------------------------*/
+		
+		public String createH(String name)
+		{
+			
+			String hin="insert into hindi values(?)";
+			
+			
+			try
+			{
+			PreparedStatement ps = con.prepareStatement(hin);
+			
+			ps.setString(1, name);
+			ps.executeUpdate();
+			}
+			catch(Exception e)
+			{
+				System.out.print(e);
+			}
+			
+			return name;
+		}
 		
 
+		public String showH()
+		{
+			String s="select data from hindi";
+			JSONObject jo=new JSONObject();
+			JSONArray ja=new JSONArray();
+			try
+			{
+			Statement st=con.createStatement();
+			ResultSet rs=st.executeQuery(s);
+			
+			while(rs.next())
+			{
+				ja.put(rs.getString(1));
+				
+			}
+			jo.put("name", ja);
+			}
+			catch(Exception e)
+			{
+				System.out.println(e);
+			}
+
+			return jo.toString();
+		}
 }
 

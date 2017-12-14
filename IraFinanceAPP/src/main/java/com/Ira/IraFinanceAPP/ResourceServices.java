@@ -19,9 +19,9 @@ public class ResourceServices {
 	@GET
 	@Path("create")
 	//@Produces(MediaType.APPLICATION_XML)
-	@Consumes(MediaType.APPLICATION_XML)
+	@Consumes(MediaType.APPLICATION_JSON)
    
-	public String createUser(@QueryParam("pswd") String pswd,
+	public String createUser(@QueryParam("pass") String pswd,
 							@QueryParam("shop") String shopname,@QueryParam("add") String address,
 							@QueryParam("mnum") String mobilenumber,@QueryParam("email") String emailid,
 							@QueryParam("gstn") String gstnumber,@QueryParam("accl") String acctlocked,
@@ -49,8 +49,8 @@ public class ResourceServices {
 	
 	@GET
 	@Path("login")
-	
-	public String loginU(@QueryParam("user") String username,@QueryParam("pswd") String password)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String loginU(@QueryParam("user") String username,@QueryParam("pass") String password)
 	{
 		return db.loginUser(username,password);
 		
@@ -64,6 +64,7 @@ public class ResourceServices {
 	   @GET
 	   @Path("forgetuser")
 	   @Produces(MediaType.APPLICATION_JSON)
+	   @Consumes(MediaType.APPLICATION_JSON)
 	   public String forgetUser(@QueryParam("mobile") String mobilenumber)
 	   {
 		   return db.forgetUs(mobilenumber);
@@ -74,7 +75,7 @@ public class ResourceServices {
 	
 	   @GET
 	   @Path("forgetpassword")
-	   
+	   @Consumes(MediaType.APPLICATION_JSON)
 	   public String forgetPassword(@QueryParam("user") String username)
 	   {
 		   return db.forgetPd(username);
@@ -86,7 +87,7 @@ public class ResourceServices {
 	   
 	   @GET
 	   @Path("temppass")
-	   //@Consumes(MediaType.APPLICATION_XML)
+	   @Consumes(MediaType.APPLICATION_JSON)
 	   public String tempPassword(@QueryParam("user") String username,@QueryParam("pass") String password )
 	   {
 		   return db.tempPass(username,password);
@@ -97,7 +98,7 @@ public class ResourceServices {
 	   
 	   @GET
 	   @Path("resetpass")
-	   @Consumes(MediaType.APPLICATION_XML)
+	   @Consumes(MediaType.APPLICATION_JSON)
 	   public String resetPassword(@QueryParam("user") String username,@QueryParam("pass") String password)
 	   {
 		   return db.resetPass(username,password);
@@ -109,7 +110,8 @@ public class ResourceServices {
 	   
 	   @GET
 	   @Path("csuser")
-	   @Consumes(MediaType.APPLICATION_XML)
+	  
+	   @Consumes(MediaType.APPLICATION_JSON)
 	   public String createSubUser(@QueryParam("user") String user, @QueryParam("cuname") String username,
 			   @QueryParam("cpass") String paswd,@QueryParam("access") String  access,
 			   @QueryParam("sdate") String substartdate,@QueryParam("edate") String subenddate)
@@ -132,11 +134,43 @@ public class ResourceServices {
 	   
 	   @GET
 	   @Path("editsubuser")
+	   @Consumes(MediaType.APPLICATION_JSON)
 	   public String editSubUser(@QueryParam("user") String username,@QueryParam("pass") String paswd,
 			   					 @QueryParam("access") String access)
 	   {
 		  return db.editSuser(username,paswd,access);
 	   }
-	   	   
+	
+	   
+/*10.---------------------------------GET SUB USER ACCESS----------------------------------------*/	   
+	   
+	
+	   @GET
+	   @Path("getsubuseraccess")
+	   @Consumes(MediaType.APPLICATION_JSON)
+	  // @Produces(MediaType.APPLICATION_XML)
+	   public String getSubUser(@QueryParam("user") String username)
+	   {
+		   return db.getSubAccess(username);
+	   }
+	 
+	   
+	   
+	 /*----------------------------HINDI---------------------------*/
+	   @GET
+	   @Path("hindi")
+	   @Consumes(MediaType.APPLICATION_JSON)
+	   public String createHindi(@QueryParam("name") String name)
+	   {
+		   return db.createH(name);
+	   }
+	   
+	   @GET
+	   @Path("showhindi")
+	   @Produces(MediaType.APPLICATION_JSON)
+	   public String showHindi()
+	   {
+		   return db.showH();
+	   }
 	   
 }
